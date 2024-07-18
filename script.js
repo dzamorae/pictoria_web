@@ -35,8 +35,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var _this = this;
-var API_KEY = 'sk-proj-f6gkEihHRgzShayCEArsT3BlbkFJvAkVpGi3VLMxl6plrVCs';
+var API_KEY = '';
 var API_URL = 'https://api.openai.com/v1/images/generations';
+//const MODEL = 'gpt-4'; // Especifica el modelo DALL-E 3
 function generateImage(prompt) {
     return __awaiter(this, void 0, void 0, function () {
         var response, data;
@@ -49,14 +50,18 @@ function generateImage(prompt) {
                             'Authorization': "Bearer ".concat(API_KEY)
                         },
                         body: JSON.stringify({
-                            prompt: prompt,
+                            model: 'dall-e-3', // Incluye el modelo en la solicitud
+                            //role: 'system', 
+                            //content: 'Eres un experto en Comunicación Aumentativa y Alternativa (CAA). Genera pictogramas simples y explícitos sin fondos.',
+                            prompt: 'Genera un pictograma de acuerdo al contexto ' + prompt + ' para niños de edad de 5 a 10 años',
                             n: 1,
-                            size: '512x512'
+                            size: '512x512' // Cambia el tamaño de la imagen aquí si es necesario
                         })
                     })];
                 case 1:
                     response = _a.sent();
                     if (!response.ok) {
+                        console.log(response);
                         throw new Error("Error en la solicitud: ".concat(response.statusText));
                     }
                     return [4 /*yield*/, response.json()];
@@ -71,6 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var form = document.getElementById('imageForm');
     var promptInput = document.getElementById('prompt');
     var imageContainer = document.getElementById('imageContainer');
+    var voiceButton = document.getElementById('voiceButton');
     if (form && promptInput && imageContainer) {
         form.addEventListener('submit', function (event) { return __awaiter(_this, void 0, void 0, function () {
             var prompt, imageUrl, error_1;
@@ -98,5 +104,25 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     else {
         console.error('Form or input elements not found.');
+    }
+    if (voiceButton && promptInput) {
+        var recognition_1 = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition_1.lang = 'es-ES';
+        recognition_1.interimResults = false;
+        recognition_1.maxAlternatives = 1;
+        voiceButton.addEventListener('click', function () {
+            recognition_1.start();
+        });
+        recognition_1.addEventListener('result', function (event) {
+            var lastResultIndex = event.results.length - 1;
+            var transcript = event.results[lastResultIndex][0].transcript;
+            promptInput.value = transcript;
+        });
+        recognition_1.addEventListener('speechend', function () {
+            recognition_1.stop();
+        });
+        recognition_1.addEventListener('error', function (event) {
+            console.error('Speech recognition error', event.error);
+        });
     }
 });
