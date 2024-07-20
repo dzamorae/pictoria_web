@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Imágenes con OpenAI</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        .input-container {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #f8f9fa;
+            padding: 10px;
+            box-shadow: 0 -1px 5px rgba(0,0,0,0.1);
+        }
+        .input-container input {
+            width: calc(100% - 100px);
+        }
+        .input-container button {
+            width: 80px;
+        }
+        .message {
+            margin-bottom: 10px;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container chat-container">
+        <div id="result" class="mt-4"></div>
+    </div>
+    <div class="input-container">
+        <form id="imageForm" class="form-inline">
+            <input type="text" id="prompt" class="form-control mr-2" placeholder="Describe la imagen..." required>
+            <button type="submit" class="btn btn-primary">Generar</button>
+            <button type="button" id="startButton" class="btn btn-secondary ml-2">Hablar</button>
+        </form>
+    </div>
+    <script src="script.js" type="module"></script>
+</body>
+</html>
