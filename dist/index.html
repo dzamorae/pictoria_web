@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es-es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador de Imágenes con OpenAI</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         body, html {
             height: 100%;
@@ -16,7 +17,9 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 70px; /* Espacio para el input */
         }
         .input-container {
             position: fixed;
@@ -25,15 +28,16 @@
             background: #f8f9fa;
             padding: 10px;
             box-shadow: 0 -1px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
         }
         .input-container input {
-            width: calc(100% - 100px);
+            height: 50px; /* Aumenta la altura del input */
+            font-size: 1.2em; /* Aumenta el tamaño del texto */
         }
         .input-container button {
-            width: 80px;
-        }
-        .message {
-            margin-bottom: 10px;
+            height: 50px; /* Aumenta la altura del botón */
+            font-size: 1.2em; /* Aumenta el tamaño del texto */
         }
         .loader {
             border: 4px solid #f3f3f3;
@@ -47,17 +51,27 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .result-image {
+            max-width: 512px;
+            height: auto;
+        }
     </style>
 </head>
 <body>
     <div class="container chat-container">
-        <div id="result" class="mt-4"></div>
+        <div id="result" class="mt-4 text-center">Hola, soy <b>PictorIA</b>. Una aplicación de <b>Apoyo</b> para <b>Docentes</b>.</div>
     </div>
     <div class="input-container">
-        <form id="imageForm" class="form-inline">
-            <input type="text" id="prompt" class="form-control mr-2" placeholder="Describe la imagen..." required>
-            <button type="submit" class="btn btn-primary">Generar</button>
-            <button type="button" id="startButton" class="btn btn-secondary ml-2">Hablar</button>
+        <form id="imageForm" class="form-inline w-100">
+            <div class="input-group w-100">
+                <input type="text" id="prompt" class="form-control" placeholder="Dame un contexto ..." required>
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">Generar</button>
+                    <button type="button" id="startButton" class="btn btn-primary ml-2">
+                        <i class="fas fa-microphone"></i>
+                    </button>
+                </div>
+            </div>
         </form>
     </div>
     <script src="script.js" type="module"></script>

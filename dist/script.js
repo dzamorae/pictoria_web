@@ -8,48 +8,45 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-document.addEventListener('DOMContentLoaded', () => {
-    function generateImage(prompt) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const response = yield fetch('/generate-image', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ prompt })
-            });
-            if (!response.ok) {
-                throw new Error(`Error en la solicitud: ${response.statusText}`);
-            }
-            const data = yield response.json();
-            return data.url;
+const form = document.getElementById('imageForm');
+const resultDiv = document.getElementById('result');
+const startButton = document.getElementById('startButton');
+form.addEventListener('submit', (event) => __awaiter(void 0, void 0, void 0, function* () {
+    event.preventDefault();
+    const promptInput = document.getElementById('prompt');
+    const prompt = promptInput.value;
+    // Mostrar el GIF de espera
+    resultDiv.innerHTML = '<div class="loader"></div>';
+    try {
+        const response = yield fetch('/generate-image', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ prompt })
         });
+        if (!response.ok) {
+            throw new Error('Error en la solicitud al servidor.');
+        }
+        const data = yield response.json();
+        const imageUrl = data.url;
+        resultDiv.innerHTML = `<img src="${imageUrl}" alt="Generated Image" class="img-fluid result-image" width="512px">`;
+        promptInput.value = ``;
     }
-    const form = document.getElementById('imageForm');
-    form.addEventListener('submit', (event) => __awaiter(void 0, void 0, void 0, function* () {
-        event.preventDefault();
-        const promptInput = document.getElementById('prompt');
-        const resultDiv = document.getElementById('result');
-        try {
-            const imageUrl = yield generateImage(promptInput.value);
-            resultDiv.innerHTML = `<img src="${imageUrl}" alt="Generated Image" class="img-fluid"/>`;
-        }
-        catch (error) {
-            if (error instanceof Error) {
-                resultDiv.innerHTML = `<p>Error: ${error.message}</p>`;
-            }
-            else {
-                resultDiv.innerHTML = `<p>Unexpected error</p>`;
-            }
-        }
-    }));
-    const micButton = document.getElementById('micButton');
-    micButton.addEventListener('click', () => {
-        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript;
-            document.getElementById('prompt').value = transcript;
-        };
-        recognition.start();
-    });
-});
+    catch (error) {
+        console.error('Error:', error);
+        resultDiv.textContent = 'Hubo un error al generar la imagen.';
+    }
+}));
+// Añadir reconocimiento de voz
+const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+recognition.lang = 'es-ES';
+const startRecognition = () => {
+    recognition.start();
+};
+recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    const promptInput = document.getElementById('prompt');
+    promptInput.value = transcript;
+};
+startButton.addEventListener('click', startRecognition);

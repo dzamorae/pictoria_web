@@ -33,10 +33,11 @@ app.post('/generate-image', async (req, res) => {
         'Authorization': `Bearer ${process.env.API_KEY}`
       },
       body: JSON.stringify({
-        prompt: 'Genera pictograma igual a @PictorIA con el contexto: ' + prompt,
+        //prompt: 'Genera pictograma sin letras igual a @PictorIA con el contexto: ' + prompt,
+        prompt: 'Descripción del Pictograma: ' + prompt + ' Características del Personaje: "persobaje de edad de 8 años." Estilo Visual: "Colores vivos y contrastantes, estilo simple y claro."',
         n: 1,
-        size: '512x512',
-        model: 'dall-e-2'
+        size: '1024x1024',
+        model: 'dall-e-3'
       })
     });
 
