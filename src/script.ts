@@ -1,6 +1,10 @@
 const form = document.getElementById('imageForm') as HTMLFormElement;
 const resultDiv = document.getElementById('result') as HTMLDivElement;
 const startButton = document.getElementById('startButton') as HTMLButtonElement;
+const acceptButton = document.getElementById('acceptButton') as HTMLButtonElement;
+
+let currentImageUrl = '';
+let currentPrompt = '';
 
 form.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -9,6 +13,7 @@ form.addEventListener('submit', async (event) => {
 
     // Mostrar el GIF de espera
     resultDiv.innerHTML = '<div class="loader"></div>';
+    acceptButton.style.display = 'none';
 
     try {
         const response = await fetch('/generate-image', {
@@ -24,12 +29,36 @@ form.addEventListener('submit', async (event) => {
         }
 
         const data = await response.json();
-        const imageUrl = data.url;
-        resultDiv.innerHTML = `<img src="${imageUrl}" alt="Generated Image" class="img-fluid result-image" width="512px">`;
-        promptInput.value = ``;
-      } catch (error) {
+        currentImageUrl = data.url;
+        currentPrompt = prompt;
+        resultDiv.innerHTML = `<img src="${currentImageUrl}" alt="Imagen generada" class="img-fluid result-image">`;
+        acceptButton.style.display = 'inline-block';
+    } catch (error) {
         console.error('Error:', error);
         resultDiv.textContent = 'Hubo un error al generar la imagen.';
+    }
+});
+
+acceptButton.addEventListener('click', async () => {
+    try {
+        const response = await fetch('/save-image', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ prompt: currentPrompt, url: currentImageUrl })
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al guardar la imagen.');
+        }
+
+        const data = await response.json();
+        alert('Imagen guardada exitosamente. URL: ' + data.url);
+        acceptButton.style.display = 'none';
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Hubo un error al guardar la imagen.');
     }
 });
 

@@ -11,12 +11,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 const form = document.getElementById('imageForm');
 const resultDiv = document.getElementById('result');
 const startButton = document.getElementById('startButton');
+const acceptButton = document.getElementById('acceptButton');
+let currentImageUrl = '';
+let currentPrompt = '';
 form.addEventListener('submit', (event) => __awaiter(void 0, void 0, void 0, function* () {
     event.preventDefault();
     const promptInput = document.getElementById('prompt');
     const prompt = promptInput.value;
     // Mostrar el GIF de espera
     resultDiv.innerHTML = '<div class="loader"></div>';
+    acceptButton.style.display = 'none';
     try {
         const response = yield fetch('/generate-image', {
             method: 'POST',
@@ -29,13 +33,35 @@ form.addEventListener('submit', (event) => __awaiter(void 0, void 0, void 0, fun
             throw new Error('Error en la solicitud al servidor.');
         }
         const data = yield response.json();
-        const imageUrl = data.url;
-        resultDiv.innerHTML = `<img src="${imageUrl}" alt="Generated Image" class="img-fluid result-image" width="512px">`;
-        promptInput.value = ``;
+        currentImageUrl = data.url;
+        currentPrompt = prompt;
+        resultDiv.innerHTML = `<img src="${currentImageUrl}" alt="Imagen generada" class="img-fluid result-image">`;
+        acceptButton.style.display = 'inline-block';
     }
     catch (error) {
         console.error('Error:', error);
         resultDiv.textContent = 'Hubo un error al generar la imagen.';
+    }
+}));
+acceptButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const response = yield fetch('/save-image', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ prompt: currentPrompt, url: currentImageUrl })
+        });
+        if (!response.ok) {
+            throw new Error('Error al guardar la imagen.');
+        }
+        const data = yield response.json();
+        alert('Imagen guardada exitosamente. URL: ' + data.url);
+        acceptButton.style.display = 'none';
+    }
+    catch (error) {
+        console.error('Error:', error);
+        alert('Hubo un error al guardar la imagen.');
     }
 }));
 // Añadir reconocimiento de voz
