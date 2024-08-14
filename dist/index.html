@@ -55,12 +55,36 @@
             max-width: 512px;
             height: auto;
         }
+
+        .pictogram-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .pictogram-item {
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 5px;
+        max-width: 200px;
+        text-align: center;
+    }
+
+    .pictogram-item img {
+        max-width: 100%;
+        height: auto;
+        margin-top: 10px;
+    }
     </style>
 </head>
 <body>
     <div class="container chat-container">
-        <div id="result" class="mt-4 text-center">Hola, soy <b>PictorIA</b>. Una aplicación de <b>Apoyo</b> para <b>Docentes</b>.</div>
+        <button id="viewPictogramsButton" class="btn btn-info mt-3">Ver Pictogramas Guardados</button>
+        <div id="result" class="mt-4 text-center"></div>
         <button id="acceptButton" class="btn btn-success mt-3" style="display: none;">Aceptar Imagen</button>
+        <div id="savedPictograms" class="mt-4 text-center" style="display: none;"></div>
     </div>
     <div class="input-container">
         <form id="imageForm" class="form-inline w-100">

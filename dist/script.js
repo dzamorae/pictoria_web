@@ -12,6 +12,8 @@ const form = document.getElementById('imageForm');
 const resultDiv = document.getElementById('result');
 const startButton = document.getElementById('startButton');
 const acceptButton = document.getElementById('acceptButton');
+const viewPictogramsButton = document.getElementById('viewPictogramsButton');
+const savedPictogramsDiv = document.getElementById('savedPictograms');
 let currentImageUrl = '';
 let currentPrompt = '';
 form.addEventListener('submit', (event) => __awaiter(void 0, void 0, void 0, function* () {
@@ -35,7 +37,7 @@ form.addEventListener('submit', (event) => __awaiter(void 0, void 0, void 0, fun
         const data = yield response.json();
         currentImageUrl = data.url;
         currentPrompt = prompt;
-        resultDiv.innerHTML = `<img src="${currentImageUrl}" alt="Imagen generada" class="img-fluid result-image">`;
+        resultDiv.innerHTML = `<img src="${currentImageUrl}" alt="Imagen Generada" class="img-fluid result-image">`;
         acceptButton.style.display = 'inline-block';
     }
     catch (error) {
@@ -61,7 +63,43 @@ acceptButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, f
     }
     catch (error) {
         console.error('Error:', error);
-        alert('Hubo un error al guardar la imagen.');
+        alert('Hubo un error guardando la imagen.');
+    }
+}));
+viewPictogramsButton.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const response = yield fetch('/get-pictograms', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Error obteniendo los pictogramas guardados.');
+        }
+        const pictograms = yield response.json();
+        console.log('Resultado:', pictograms);
+        // Chequear si el array está vacío
+        if (pictograms.length === 0) {
+            savedPictogramsDiv.textContent = 'No se encontraron pictogramas guardados.';
+            savedPictogramsDiv.style.display = 'block';
+            return;
+        }
+        if (!Array.isArray(pictograms)) {
+            throw new Error('La respuesta no es un array.');
+        }
+        savedPictogramsDiv.innerHTML = pictograms.map(pictogram => `
+            <div class="pictogram-item">
+                <p><strong>Prompt:</strong> ${pictogram.prompt}</p>
+                <img src="${pictogram.url_imagen}" alt="Saved Image" class="img-fluid result-image">
+            </div>
+        `).join('');
+        savedPictogramsDiv.style.display = 'block';
+    }
+    catch (error) {
+        console.error('Error:', error);
+        savedPictogramsDiv.textContent = 'Hubo un error obteniendo los pictogramas guardados.';
+        savedPictogramsDiv.style.display = 'block';
     }
 }));
 // Añadir reconocimiento de voz

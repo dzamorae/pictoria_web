@@ -3,19 +3,23 @@ import cors from 'cors';
 import bodyParser from 'body-parser';
 import fetch from 'node-fetch';
 import dotenv from 'dotenv';
-import openDb from './database.js';
-import { fileURLToPath } from 'url';
+import db from './database.js';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
+// Configuración de dotenv
 dotenv.config();
 
+// Obtener el nombre de archivo y directorio actual
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Configuración de Express
 const app = express();
 const port = process.env.PORT || 3000;
 
+// Middleware para parsear JSON
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -72,51 +76,64 @@ app.post('/generate-image', async (req, res) => {
   }
 });
 
-app.get('/get-pictograms', async (req, res) => {
-    try {
-        const db = await openDb();
-        const pictograms = await db.all('SELECT prompt, url_imagen FROM Pictograma WHERE usuario_id = ? ORDER BY fecha_creacion', [1]);
-
-        if (pictograms.length === 0) {
-            console.log('No se encontraron pictogramas.');
-            return res.status(404).json({ error: 'No se encontraron pictogramas.' });
-        }
-
-        console.log('Pictogramas encontrados:', pictograms);
-        res.json(pictograms);
-    } catch (error) {
-        console.error('Error al obtener los pictogramas:', error);
-        res.status(500).json({ error: 'Error al obtener los pictogramas.' });
-    }
-});
-
 app.post('/save-image', async (req, res) => {
-    const { prompt, url } = req.body;
+  const { prompt, url } = req.body;
 
-    if (!prompt || !url) {
-      console.error('Prompt and URL are required');
-      return res.status(400).json({ error: 'Prompt and URL are required' });
-    }
+  if (!prompt || !url) {
+    console.error('Prompt and URL are required');
+    return res.status(400).json({ error: 'Prompt and URL are required' });
+  }
 
-    const usuarioId = 1; // Debes obtener esto de la sesión o del request
-    const fechaCreacion = new Date().toISOString().split('T')[0];
-    const imagePath = path.join(__dirname, 'images', `${Date.now()}.png`);
+  const usuarioId = 1; // Debes obtener esto de la sesión o del request
+  const fechaCreacion = new Date().toISOString().split('T')[0];
+  const imagePath = path.join(__dirname, 'images', `${Date.now()}.png`);
 
+  try {
+    await downloadImage(url, imagePath);
+    const localUrl = `/images/${path.basename(imagePath)}`;
 
-    try {
-        await downloadImage(url, imagePath);
-        const localUrl = `/images/${path.basename(imagePath)}`;
+    await db.run(
+      'INSERT INTO Pictograma (usuario_id, prompt, url_imagen, fecha_creacion) VALUES (?, ?, ?, ?)',
+      [usuarioId, prompt, localUrl, fechaCreacion]
+    );
 
-        const db = await openDb();
-        await db.run('INSERT INTO Pictograma (usuario_id, prompt, url_imagen, fecha_creacion) VALUES (?, ?, ?, ?)', [usuarioId, prompt, localUrl, fechaCreacion]);
-
-        res.status(201).json({ message: 'Pictograma guardado con éxito', url: localUrl });
-    } catch (error) {
-        console.error('Error al guardar el pictograma:', error);
-        res.status(500).json({ error: 'Error al guardar el pictograma.' });
-    }
+    res.json({ message: 'Image saved successfully', url: localUrl });
+  } catch (error) {
+    console.error(`Error saving image: ${error.message}`);
+    res.status(500).json({ error: 'Failed to save image locally' });
+  }
 });
+
+app.get('/get-pictograms', async (req, res) => {
+
+  //const usuarioId = 1; // Debes obtener esto de la sesión o del request
+  var resultado;
+  var err;
+  try {
+    const pictograms = db.all(
+      'SELECT prompt, url_imagen FROM Pictograma WHERE usuario_id = 1 ORDER BY fecha_creacion',
+      []
+    );
+
+    // Chequear si se encontraron resultados
+    if (pictograms.length === 0) {
+      console.log('No se encontraron pictogramas para este usuario.');
+      return res.status(404).json({ error: 'No se encontraron pictogramas.' });
+    }
+
+    console.log('Pictogramas encontrados:', pictograms.recordset);
+    console.log('Pictogramas encontrados:', resultado);
+
+    res.json(pictograms); // Envía los pictogramas al cliente
+  } catch (error) {
+    console.error('Error fetching pictograms:', error);
+    res.status(500).json({ error: 'Failed to fetch pictograms' });
+  }
+
+  return true;
+});
+
 
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server running at http://localhost:${port}`);
 });
