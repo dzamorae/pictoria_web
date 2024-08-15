@@ -10,7 +10,6 @@ const form = document.getElementById('imageForm') as HTMLFormElement;
 const resultDiv = document.getElementById('result') as HTMLDivElement;
 const startButton = document.getElementById('startButton') as HTMLButtonElement;
 const acceptButton = document.getElementById('acceptButton') as HTMLButtonElement;
-const viewPictogramsButton = document.getElementById('viewPictogramsButton') as HTMLButtonElement;
 const savedPictogramsDiv = document.getElementById('savedPictograms') as HTMLDivElement;
 
 let currentImageUrl = '';
@@ -51,6 +50,7 @@ form.addEventListener('submit', async (event) => {
 
 acceptButton.addEventListener('click', async () => {
     try {
+        const promptInput = document.getElementById('prompt') as HTMLInputElement;
         const response = await fetch('/save-image', {
             method: 'POST',
             headers: {
@@ -64,52 +64,13 @@ acceptButton.addEventListener('click', async () => {
         }
 
         const data = await response.json();
-        alert('Imagen guardada exitosamente. URL: ' + data.url);
+        resultDiv.innerHTML = `Genial que te haya gustado la imagen, la he guardado para ti.`;
         acceptButton.style.display = 'none';
+        promptInput.value = '';
+
     } catch (error) {
         console.error('Error:', error);
         alert('Hubo un error guardando la imagen.');
-    }
-});
-
-viewPictogramsButton.addEventListener('click', async () => {
-    try {
-        const response = await fetch('/get-pictograms', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error('Error obteniendo los pictogramas guardados.');
-        }
-
-        const pictograms: Pictogram[] = await response.json();
-        console.log('Resultado:', pictograms);
-
-        // Chequear si el array está vacío
-        if (pictograms.length === 0) {
-            savedPictogramsDiv.textContent = 'No se encontraron pictogramas guardados.';
-            savedPictogramsDiv.style.display = 'block';
-            return;
-        }
-
-        if (!Array.isArray(pictograms)) {
-            throw new Error('La respuesta no es un array.');
-        }
-
-        savedPictogramsDiv.innerHTML = pictograms.map(pictogram => `
-            <div class="pictogram-item">
-                <p><strong>Prompt:</strong> ${pictogram.prompt}</p>
-                <img src="${pictogram.url_imagen}" alt="Saved Image" class="img-fluid result-image">
-            </div>
-        `).join('');
-        savedPictogramsDiv.style.display = 'block';
-    } catch (error) {
-        console.error('Error:', error);
-        savedPictogramsDiv.textContent = 'Hubo un error obteniendo los pictogramas guardados.';
-        savedPictogramsDiv.style.display = 'block';
     }
 });
 
