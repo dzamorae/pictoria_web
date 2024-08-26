@@ -81,6 +81,64 @@
             height: auto;
         }
 
+        /* Mantener el título y el campo de búsqueda fijos en la parte superior */
+        #viewSection {
+            position: relative;
+            padding-top: 20px;
+            display: none;
+            width: 100%;
+        }
+
+        #searchContainer {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: #fff;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        h2 {
+            margin: 0;
+            padding-bottom: 10px;
+        }
+
+        /* Estilo de la cuadrícula de imágenes */
+        .image-grid {
+            margin-top: 20px; /* Espacio debajo del campo de búsqueda */
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            align-content: start; /* Asegura que las imágenes se alineen al principio */
+        }
+
+        /* Imágenes dentro de la cuadrícula */
+        .image-grid img {
+            width: 100%;
+            height: auto;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: transform 0.3s ease;
+        }
+
+        .image-grid img:hover {
+            transform: scale(1.05);
+        }
+
+        .modal-body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #modalImage {
+            max-width: 100%;
+            max-height: 100vh; /* Limitar la altura máxima a la altura de la ventana */
+            width: auto;
+            height: auto;
+            transition: all 0.3s ease; /* Suavizar la transición al maximizar/restaurar */
+        }
+
     </style>
 </head>
 <body>
@@ -98,8 +156,23 @@
             </ul>
         </div>
     </nav>
+  
+    <div class="container" id="viewSection">
+        <!-- Campo de búsqueda -->
+        <div id="searchContainer">
+            <h2>Pictogramas Guardados</h2>
+            <div class="input-group mb-3">
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar por palabras clave...">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" id="searchButton">Buscar</button>
+                </div>
+            </div>
+        </div>
+        <div class="image-grid" id="imageGrid"></div>
+    </div>
 
-    <div class="container chat-container">
+    <div class="container chat-container">        
+        
         <div id="generateSection" class="center">
             <div id="result" class="mt-4 text-center">Hola, soy <b>PictorIA</b>. Una aplicación de <b>Apoyo</b> para <b>Docentes</b>.</div>
             <center>
@@ -107,10 +180,6 @@
                     <i class="fas fa-check-double"></i>
                 </button>
             </center>
-        </div>
-        <div id="viewSection" style="display: none;">
-            <h2>Pictogramas Guardados</h2>
-            <div class="image-grid" id="imageGrid"></div>
         </div>
     </div>
     <div class="input-container" id="inputSection">
@@ -138,9 +207,10 @@
                     </button>
                 </div>
                 <div class="modal-body text-center">
-                    <img id="modalImage" src="" alt="Pictograma">
+                    <img id="modalImage" src="" alt="Pictograma" style="max-width: 100%; height: auto;">
                 </div>
                 <div class="modal-footer">
+                    <button type="button" id="maximizeButton" class="btn btn-secondary">Maximizar</button>
                     <a id="downloadButton" href="#" download class="btn btn-primary">Descargar Imagen</a>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                 </div>
@@ -151,7 +221,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="script.js" type="module"></script>
+    <script src="app.js" type="module"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const generateTab = document.getElementById('generateTab');
@@ -172,6 +242,7 @@
             });
 
             viewTab.addEventListener('click', async () => {
+                $('#searchInput').val('');
                 generateSection.style.display = 'none';
                 inputSection.style.display = 'none';
                 viewSection.style.display = 'block';

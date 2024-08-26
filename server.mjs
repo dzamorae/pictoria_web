@@ -49,7 +49,7 @@ app.post('/generate-image', async (req, res) => {
         'Authorization': `Bearer ${process.env.API_KEY}`
       },
       body: JSON.stringify({
-        prompt: 'Descripción del Pictograma: ' + prompt + ' Estilo Visual: "Colores vivos y contrastantes, estilo simple y claro." Comprensión: "Para niños de 5 a 8 años de edad."',
+        prompt: 'Descripción del Pictograma: ' + prompt + ' Estilo Visual: "Colores vivos y contrastantes, estilo simple y claro." Comprensión: "Para niños de 5 a 15 años de edad."',
         n: 1,
         size: '1024x1024',  // Cambia el tamaño de la imagen a uno compatible
         model: 'dall-e-3'
@@ -73,9 +73,13 @@ app.post('/generate-image', async (req, res) => {
 });
 
 app.get('/get-pictograms', async (req, res) => {
+
+    const { keyword } = req.query;
+
     try {
         const db = await openDb();
-        const pictograms = await db.all('SELECT prompt, url_imagen FROM Pictograma WHERE usuario_id = ? ORDER BY fecha_creacion', [1]);
+        const pictograms = await db.all(
+          'SELECT prompt, url_imagen, estado FROM Pictograma WHERE usuario_id = ? ORDER BY fecha_creacion', [1]);
 
         if (pictograms.length === 0) {
             console.log('No se encontraron pictogramas.');
@@ -83,7 +87,7 @@ app.get('/get-pictograms', async (req, res) => {
         }
 
         console.log('Pictogramas encontrados:', pictograms);
-        res.json(pictograms);
+        res.status(200).json(pictograms);
     } catch (error) {
         console.error('Error al obtener los pictogramas:', error);
         res.status(500).json({ error: 'Error al obtener los pictogramas.' });
@@ -108,13 +112,43 @@ app.post('/save-image', async (req, res) => {
         const localUrl = `/images/${path.basename(imagePath)}`;
 
         const db = await openDb();
-        await db.run('INSERT INTO Pictograma (usuario_id, prompt, url_imagen, fecha_creacion) VALUES (?, ?, ?, ?)', [usuarioId, prompt, localUrl, fechaCreacion]);
+        await db.run('INSERT INTO Pictograma (usuario_id, prompt, url_imagen, fecha_creacion, estado) VALUES (?, ?, ?, ? , "V")', [usuarioId, prompt, localUrl, fechaCreacion]);
 
         res.status(201).json({ message: 'Pictograma guardado con éxito', url: localUrl });
     } catch (error) {
         console.error('Error al guardar el pictograma:', error);
         res.status(500).json({ error: 'Error al guardar el pictograma.' });
     }
+});
+
+app.get('/search-pictograms', async (req, res) => {
+  const { keyword } = req.query;
+
+  try {
+      const db = await openDb();
+      const query = `
+          SELECT * FROM Pictograma WHERE prompt LIKE ? 
+      `;
+      const pictograms = await db.all(query, [`%${keyword}%`]);
+
+      res.json(pictograms);
+  } catch (error) {
+      console.error('Error al buscar pictogramas:', error);
+      res.status(500).json({ error: 'Error al buscar pictogramas' });
+  }
+});
+
+app.post('/delete-pictogram', async (req, res) => {
+  const { id } = req.body;
+
+  try {
+      const db = await openDb();
+      await db.run('UPDATE Pictograma SET estado = "A" WHERE id = ?', [id]);
+      res.status(200).json({ message: 'Pictograma anulado con éxito' });
+  } catch (error) {
+      console.error('Error al anular pictograma:', error);
+      res.status(500).json({ error: 'Error al anular el pictograma' });
+  }
 });
 
 app.listen(port, () => {
