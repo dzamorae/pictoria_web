@@ -7,6 +7,8 @@ import openDb from './database.js';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import path from 'path';
+import bcrypt from 'bcrypt';
+import session from 'express-session';
 
 dotenv.config();
 
@@ -19,6 +21,14 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// Configurar express-session
+app.use(session({
+  secret: 'K/n3o85TUZbp', // Cambia esto por una clave secreta segura
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false } // Cambiar a true si usas HTTPS
+}));
 
 // Ruta para servir archivos estáticos
 app.use(express.static('dist'));
@@ -73,20 +83,22 @@ app.post('/generate-image', async (req, res) => {
 });
 
 app.get('/get-pictograms', async (req, res) => {
+    const userId = req.session.userId;
 
-    const { keyword } = req.query;
-
+    if (!userId) {
+        return res.status(401).json({ error: 'Usuario no autenticado' });
+    }
+    console.log('Id Usuario ', userId);
     try {
         const db = await openDb();
         const pictograms = await db.all(
-          'SELECT prompt, url_imagen, estado FROM Pictograma WHERE usuario_id = ? ORDER BY fecha_creacion', [1]);
+          'SELECT prompt, url_imagen, estado FROM Pictograma WHERE usuario_id = ? and estado = "V" ORDER BY fecha_creacion', [userId]);
 
         if (pictograms.length === 0) {
             console.log('No se encontraron pictogramas.');
-            return res.status(404).json({ error: 'No se encontraron pictogramas.' });
+            return res.status(404).json({ error: 'No hay pictogramas guardados.' });
         }
 
-        console.log('Pictogramas encontrados:', pictograms);
         res.status(200).json(pictograms);
     } catch (error) {
         console.error('Error al obtener los pictogramas:', error);
@@ -96,13 +108,18 @@ app.get('/get-pictograms', async (req, res) => {
 
 app.post('/save-image', async (req, res) => {
     const { prompt, url } = req.body;
+    const userId = req.session.userId;
+
+    if (!userId) {
+        return res.status(401).json({ error: 'Usuario no autenticado' });
+    }
 
     if (!prompt || !url) {
       console.error('Prompt and URL are required');
       return res.status(400).json({ error: 'Prompt and URL are required' });
     }
 
-    const usuarioId = 1; // Debes obtener esto de la sesión o del request
+    const usuarioId = userId; // Debes obtener esto de la sesión o del request
     const fechaCreacion = new Date().toISOString().split('T')[0];
     const imagePath = path.join(__dirname, 'images', `${Date.now()}.png`);
 
@@ -123,13 +140,18 @@ app.post('/save-image', async (req, res) => {
 
 app.get('/search-pictograms', async (req, res) => {
   const { keyword } = req.query;
+  const userId = req.session.userId;
+  console.log("serach-pictograms ", "userId: ", userId);
+    if (!userId) {
+        return res.status(401).json({ error: 'Usuario no autenticado' });
+    }
 
   try {
       const db = await openDb();
       const query = `
-          SELECT * FROM Pictograma WHERE prompt LIKE ? 
+          SELECT * FROM Pictograma WHERE prompt LIKE ? and estado = 'V' and usuario_id = ?
       `;
-      const pictograms = await db.all(query, [`%${keyword}%`]);
+      const pictograms = await db.all(query, [`%${keyword}%`, userId]);
 
       res.json(pictograms);
   } catch (error) {
@@ -150,6 +172,44 @@ app.post('/delete-pictogram', async (req, res) => {
       res.status(500).json({ error: 'Error al anular el pictograma' });
   }
 });
+
+app.post('/register', async (req, res) => {
+  const { nombre, email, password } = req.body;
+
+  try {
+      const db = await openDb();
+      const hashedPassword = await bcrypt.hash(password, 10);
+      
+      await db.run('INSERT INTO Usuario (nombre, email, password, fecha_registro) VALUES (?, ?, ?, current_date)', [nombre, email, hashedPassword]);
+
+      res.status(201).json({ message: 'Usuario registrado con éxito' });
+  } catch (error) {
+      console.error('Error en el registro:', error);
+      res.status(500).json({ error: 'Error en el registro de usuario' });
+  }
+});
+
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+      const db = await openDb();
+      const user = await db.get('SELECT * FROM Usuario WHERE email = ?', [email]);
+
+      if (user && await bcrypt.compare(password, user.password)) {
+          // Aquí podrías generar un token de sesión o JWT si es necesario
+          // Guardar el ID del usuario en la sesión
+          req.session.userId = user.id;
+          res.status(200).json({ message: 'Inicio de sesión exitoso', token: '' });
+      } else {
+          res.status(401).json({ error: 'Credenciales inválidas' });
+      }
+  } catch (error) {
+      console.error('Error en el inicio de sesión:', error);
+      res.status(500).json({ error: 'Error en el inicio de sesión' });
+  }
+});
+
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);

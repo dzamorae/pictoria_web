@@ -1,5 +1,6 @@
 import { generateImage, savePictogram, loadPictograms } from './api.js';
 import { Pictogram } from './pictogram.js';
+import * as bootstrap from 'bootstrap';
 
 export function setupEventListeners() {
     const form = document.getElementById('imageForm') as HTMLFormElement;
@@ -55,13 +56,10 @@ export function setupEventListeners() {
                 loadPictograms(keyword).then((pictograms: Pictogram[]) => {
                     const filteredPictograms = pictograms.filter((pictogram: Pictogram) => pictogram.estado === 'V');
 
-                    /*imageGrid.innerHTML = pictograms.map((pictogram: Pictogram) => `
-                        <img src="${pictogram.url_imagen}" alt="${pictogram.prompt}" data-toggle="modal" data-target="#imageModal" data-url="${pictogram.url_imagen}">
-                    `).join('');*/
                     imageGrid.innerHTML = filteredPictograms.map((pictogram: Pictogram) => `
                         <div class="pictogram-item">
                             <img src="${pictogram.url_imagen}" alt="${pictogram.prompt}" data-toggle="modal" data-target="#imageModal" data-url="${pictogram.url_imagen}">
-                            <button class="btn btn-danger btn-sm delete-button" data-id="${pictogram.id}">Eliminar</button>
+                            <div class="delete-icon" data-id="${pictogram.id}"><i class="fas fa-times"></i></div>
                         </div>
                     `).join('');
 
@@ -82,10 +80,11 @@ export function setupEventListeners() {
                         });
                     });
 
-                    document.querySelectorAll('.delete-button').forEach(button => {
+                    document.querySelectorAll('.delete-icon').forEach(button => {
                         button.addEventListener('click', async (event) => {
                             const id = (event.currentTarget as HTMLElement).getAttribute('data-id');
                             if (id) {
+                                
                                 try {
                                     const response = await fetch('/delete-pictogram', {
                                         method: 'POST',
@@ -96,15 +95,46 @@ export function setupEventListeners() {
                                     });
                 
                                     if (!response.ok) {
-                                        throw new Error('Error al anular el pictograma');
+                                        throw new Error('Error al eliminar el pictograma');
                                     }
                 
-                                    alert('Pictograma anulado con éxito');
-                                    (event.currentTarget as HTMLElement).parentElement?.remove(); // Remover el pictograma del DOM
+                                    alert('Pictograma eliminado correctamente.');
+                                    // Recargar la lista de pictogramas después de la eliminación
+                                    loadPictograms(keyword).then((updatedPictograms: Pictogram[]) => {
+                                        const updatedFilteredPictograms = updatedPictograms.filter((pictogram: Pictogram) => pictogram.estado === 'V');
+                                        imageGrid.innerHTML = updatedFilteredPictograms.map((pictogram: Pictogram) => `
+                                            <div class="pictogram-item">
+                                                <img src="${pictogram.url_imagen}" alt="${pictogram.prompt}" data-toggle="modal" data-target="#imageModal" data-url="${pictogram.url_imagen}">
+                                                <div class="delete-icon" data-id="${pictogram.id}"><i class="fas fa-times"></i></div>
+                                            </div>
+                                        `).join('');
+                                        // Volver a agregar los event listeners para los botones y las imágenes
+                                        document.querySelectorAll('.image-grid img').forEach(img => {
+                                            img.addEventListener('click', () => {
+                                                const imgUrl = (img as HTMLImageElement).getAttribute('data-url') as string;
+                                                if (modalImage) {
+                                                    modalImage.src = imgUrl;
+                                                    isMaximized = false;
+                                                    modalImage.style.maxWidth = '100%';
+                                                    modalImage.style.maxHeight = '100vh';
+                                                    modalImage.style.width = 'auto';
+                                                    modalImage.style.height = 'auto';
+                                                }
+                                                const downloadButton = document.getElementById('downloadButton') as HTMLAnchorElement;
+                                                modalImage.src = imgUrl;
+                                                downloadButton.href = imgUrl;
+                                            });
+                                        });
+                                    });
+                                    //(event.currentTarget as HTMLElement).parentElement?.remove(); // Remover el pictograma del DOM
                                 } catch (error) {
                                     console.error('Error:', error);
-                                    alert('Hubo un error al anular el pictograma.');
+                                    alert('Hubo un error al eliminar el pictograma.');
                                 }
+
+
+
+                                
                             }
                         });
                     });
@@ -133,7 +163,7 @@ export function setupEventListeners() {
         });
     }
 }
-
+/*
 document.querySelectorAll('.delete-button').forEach(button => {
     button.addEventListener('click', async (event) => {
         const id = (event.currentTarget as HTMLElement).getAttribute('data-id');
@@ -161,3 +191,4 @@ document.querySelectorAll('.delete-button').forEach(button => {
         }
     });
 });
+*/

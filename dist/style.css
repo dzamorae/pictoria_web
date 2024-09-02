@@ -1,50 +1,169 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-  
-  .container {
-    text-align: center;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  form {
-    margin-bottom: 20px;
-  }
-  
-  input[type="text"] {
-    width: 80%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-  }
-  
-  button {
-    padding: 10px 20px;
-    background: #007BFF;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background: #0056b3;
-  }
-  
-  #imageContainer img {
-    max-width: 100%;
-    margin-top: 20px;
-    border-radius: 10px;
-  }
-  
+body, html {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 70px; /* Espacio para el input */
+}
+.input-container {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background: #f8f9fa;
+  padding: 10px;
+  box-shadow: 0 -1px 5px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: center;
+}
+.input-container input {
+  height: 50px; /* Aumenta la altura del input */
+  font-size: 1.2em; /* Aumenta el tamaño del texto */
+}
+.input-container button {
+  height: 50px; /* Aumenta la altura del botón */
+  font-size: 1.2em; /* Aumenta el tamaño del texto */
+}
+.loader {
+  border: 4px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 4px solid #3498db;
+  width: 40px;
+  height: 40px;
+  animation: spin 2s linear infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.result-image {
+  max-width: 30%;
+  height: auto;
+}
+
+/* Estilos para la matriz de imágenes */
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.image-grid img {
+  width: 100%;
+  height: auto;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: transform 0.3s ease;
+}
+
+.image-grid img:hover {
+  transform: scale(1.05);
+}
+
+.modal-body img {
+  width: 100%;
+  height: auto;
+}
+
+/* Mantener el título y el campo de búsqueda fijos en la parte superior */
+#viewSection {
+  position: relative;
+  padding-top: 20px;
+  display: none;
+  width: 100%;
+}
+
+#searchContainer {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: #fff;
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+h2 {
+  margin: 0;
+  padding-bottom: 10px;
+}
+
+/* Estilo de la cuadrícula de imágenes */
+.image-grid {
+  margin-top: 20px; /* Espacio debajo del campo de búsqueda */
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  align-content: start; /* Asegura que las imágenes se alineen al principio */
+}
+
+/* Imágenes dentro de la cuadrícula */
+.image-grid img {
+  width: 100%;
+  height: auto;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: transform 0.3s ease;
+}
+
+.image-grid img:hover {
+  transform: scale(1.05);
+}
+
+.modal-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#modalImage {
+  max-width: 100%;
+  max-height: 100vh; /* Limitar la altura máxima a la altura de la ventana */
+  width: auto;
+  height: auto;
+  transition: all 0.3s ease; /* Suavizar la transición al maximizar/restaurar */
+}
+
+.pictogram-item {
+  position: relative;
+  display: inline-block;
+  margin: 10px;
+}
+
+.pictogram-item img {
+  width: 100%;
+  height: auto;
+  border-radius: 5px;
+  transition: transform 0.3s ease;
+}
+
+.pictogram-item img:hover {
+  transform: scale(1.05);
+}
+
+.delete-icon {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.delete-icon:hover {
+  background-color: darkred;
+}

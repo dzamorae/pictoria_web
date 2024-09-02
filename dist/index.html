@@ -6,142 +6,11 @@
     <title>PictorIA</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-        }
-        .chat-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding-bottom: 70px; /* Espacio para el input */
-        }
-        .input-container {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: #f8f9fa;
-            padding: 10px;
-            box-shadow: 0 -1px 5px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: center;
-        }
-        .input-container input {
-            height: 50px; /* Aumenta la altura del input */
-            font-size: 1.2em; /* Aumenta el tamaño del texto */
-        }
-        .input-container button {
-            height: 50px; /* Aumenta la altura del botón */
-            font-size: 1.2em; /* Aumenta el tamaño del texto */
-        }
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 4px solid #3498db;
-            width: 40px;
-            height: 40px;
-            animation: spin 2s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .result-image {
-            max-width: 30%;
-            height: auto;
-        }
-
-        /* Estilos para la matriz de imágenes */
-        .image-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .image-grid img {
-            width: 100%;
-            height: auto;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: transform 0.3s ease;
-        }
-
-        .image-grid img:hover {
-            transform: scale(1.05);
-        }
-
-        .modal-body img {
-            width: 100%;
-            height: auto;
-        }
-
-        /* Mantener el título y el campo de búsqueda fijos en la parte superior */
-        #viewSection {
-            position: relative;
-            padding-top: 20px;
-            display: none;
-            width: 100%;
-        }
-
-        #searchContainer {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background-color: #fff;
-            padding: 10px 0;
-            border-bottom: 1px solid #ddd;
-        }
-
-        h2 {
-            margin: 0;
-            padding-bottom: 10px;
-        }
-
-        /* Estilo de la cuadrícula de imágenes */
-        .image-grid {
-            margin-top: 20px; /* Espacio debajo del campo de búsqueda */
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            align-content: start; /* Asegura que las imágenes se alineen al principio */
-        }
-
-        /* Imágenes dentro de la cuadrícula */
-        .image-grid img {
-            width: 100%;
-            height: auto;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: transform 0.3s ease;
-        }
-
-        .image-grid img:hover {
-            transform: scale(1.05);
-        }
-
-        .modal-body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #modalImage {
-            max-width: 100%;
-            max-height: 100vh; /* Limitar la altura máxima a la altura de la ventana */
-            width: auto;
-            height: auto;
-            transition: all 0.3s ease; /* Suavizar la transición al maximizar/restaurar */
-        }
-
-    </style>
+    <link rel="stylesheet" href="style.css">
+    
 </head>
 <body>
+    
     <!-- Menú de navegación -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="#">Pictor<b>IA</b></a>
@@ -154,6 +23,8 @@
                     <a class="nav-link" href="#" id="viewTab">Visualizar</a>
                 </li>
             </ul>
+            <!-- Botón de Cerrar Sesión alineado a la derecha -->
+            <button id="logoutButton" class="btn btn-outline-danger ml-auto">Cerrar Sesión</button>
         </div>
     </nav>
   
@@ -218,6 +89,28 @@
         </div>
     </div>
 
+    <!-- Modal de Confirmación de Eliminación -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro que deseas eliminar este pictograma?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" id="confirmDeleteButton" class="btn btn-danger">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -242,6 +135,12 @@
             });
 
             viewTab.addEventListener('click', async () => {
+                const userId = localStorage.getItem('userId');
+                if (!userId) {
+                    alert('Usuario no autenticado');
+                    window.location.href = 'login.html';
+                    return;
+                }
                 $('#searchInput').val('');
                 generateSection.style.display = 'none';
                 inputSection.style.display = 'none';
@@ -251,11 +150,18 @@
 
                 try {
                     const response = await fetch('/get-pictograms', {
-                        method: 'GET',
+                        method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
-                        }
+                        },
+                        body: JSON.stringify({ userId })
                     });
+
+                    if (response.status === 404) {
+                        // Manejo del caso en que no hay pictogramas guardados
+                        document.getElementById('imageGrid').innerHTML = '<p>No hay pictogramas guardados.</p>';
+                        return;
+                    }
 
                     if (!response.ok) {
                         throw new Error('Error obteniendo los pictogramas guardados.');
@@ -264,8 +170,11 @@
                     const pictograms = await response.json();
 
                     // Cargar las imágenes en la cuadrícula
-                    imageGrid.innerHTML = pictograms.map((pictogram) => `
-                        <img src="${pictogram.url_imagen}" alt="${pictogram.prompt}" data-toggle="modal" data-target="#imageModal" data-url="${pictogram.url_imagen}">
+                    imageGrid.innerHTML = pictograms.map((pictogram) => `                        
+                        <div class="pictogram-item">
+                            <img src="${pictogram.url_imagen}" alt="${pictogram.prompt}" data-toggle="modal" data-target="#imageModal" data-url="${pictogram.url_imagen}">
+                            <div class="delete-icon" data-id="${pictogram.id}"><i class="fas fa-times"></i></div>
+                        </div>
                     `).join('');
 
                     // Configurar eventos para las imágenes
