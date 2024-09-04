@@ -1,197 +1,34 @@
 <!DOCTYPE html>
-<html lang="es-es">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PictorIA</title>
+    <title>Iniciar Sesión - PictorIA</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="style.css">
-    
 </head>
 <body>
-    
-    <!-- Menú de navegación -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Pictor<b>IA</b></a>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#" id="generateTab">Generar</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#" id="viewTab">Visualizar</a>
-                </li>
-            </ul>
-            <!-- Botón de Cerrar Sesión alineado a la derecha -->
-            <button id="logoutButton" class="btn btn-outline-danger ml-auto">Cerrar Sesión</button>
-        </div>
-    </nav>
-  
-    <div class="container" id="viewSection">
-        <!-- Campo de búsqueda -->
-        <div id="searchContainer">
-            <h2>Pictogramas Guardados</h2>
-            <div class="input-group mb-3">
-                <input type="text" id="searchInput" class="form-control" placeholder="Buscar por palabras clave...">
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button" id="searchButton">Buscar</button>
-                </div>
+    <div class="container mt-5">
+        <h2 class="text-center">Iniciar Sesión</h2>
+        <form id="loginForm" class="mt-4">
+            <div class="form-group">
+                <label for="loginEmail">Correo Electrónico:</label>
+                <input type="email" id="loginEmail" class="form-control" placeholder="Correo Electrónico" required>
             </div>
-        </div>
-        <div class="image-grid" id="imageGrid"></div>
-    </div>
-
-    <div class="container chat-container">        
-        
-        <div id="generateSection" class="center">
-            <div id="result" class="mt-4 text-center">Hola, soy <b>PictorIA</b>. Una aplicación de <b>Apoyo</b> para <b>Docentes</b>.</div>
-            <center>
-                <button type="button" id="acceptButton" class="btn btn-success mt-2 center" style="display: none;">
-                    <i class="fas fa-check-double"></i>
-                </button>
-            </center>
-        </div>
-    </div>
-    <div class="input-container" id="inputSection">
-        <form id="imageForm" class="form-inline w-100">
-            <div class="input-group w-100">
-                <input type="text" id="prompt" class="form-control" placeholder="Describe la imagen..." required>
-                <div class="input-group-append">
-                    <button type="submit" class="btn btn-primary">Generar</button>
-                    <button type="button" id="startButton" class="btn btn-primary ml-2">
-                        <i class="fas fa-microphone"></i>
-                    </button>
-                </div>
+            <div class="form-group">
+                <label for="loginPassword">Contraseña:</label>
+                <input type="password" id="loginPassword" class="form-control" placeholder="Contraseña" required>
             </div>
+            <button type="submit" class="btn btn-primary w-100">Iniciar Sesión</button>
         </form>
-    </div>
-
-    <!-- Modal para visualizar y descargar la imagen -->
-    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="imageModalLabel">Visualizar Pictograma</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body text-center">
-                    <img id="modalImage" src="" alt="Pictograma" style="max-width: 100%; height: auto;">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" id="maximizeButton" class="btn btn-secondary">Maximizar</button>
-                    <a id="downloadButton" href="#" download class="btn btn-primary">Descargar Imagen</a>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
+        
+        <!-- Enlace a la página de registro -->
+        <div class="text-center mt-3">
+            <p>¿No tienes una cuenta? <a href="register.html">Regístrate aquí</a></p>
         </div>
     </div>
 
-    <!-- Modal de Confirmación de Eliminación -->
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                ¿Estás seguro que deseas eliminar este pictograma?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                <button type="button" id="confirmDeleteButton" class="btn btn-danger">Eliminar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="app.js" type="module"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const generateTab = document.getElementById('generateTab');
-            const viewTab = document.getElementById('viewTab');
-            const generateSection = document.getElementById('generateSection');
-            const viewSection = document.getElementById('viewSection');
-            const inputSection = document.getElementById('inputSection');
-            const imageGrid = document.getElementById('imageGrid');
-            const modalImage = document.getElementById('modalImage');
-            const downloadButton = document.getElementById('downloadButton');
-
-            generateTab.addEventListener('click', () => {
-                generateSection.style.display = 'block';
-                inputSection.style.display = 'block';
-                viewSection.style.display = 'none';
-                generateTab.classList.add('active');
-                viewTab.classList.remove('active');
-            });
-
-            viewTab.addEventListener('click', async () => {
-                const userId = localStorage.getItem('userId');
-                if (!userId) {
-                    alert('Usuario no autenticado');
-                    window.location.href = 'login.html';
-                    return;
-                }
-                $('#searchInput').val('');
-                generateSection.style.display = 'none';
-                inputSection.style.display = 'none';
-                viewSection.style.display = 'block';
-                viewTab.classList.add('active');
-                generateTab.classList.remove('active');
-
-                try {
-                    const response = await fetch('/get-pictograms', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ userId })
-                    });
-
-                    if (response.status === 404) {
-                        // Manejo del caso en que no hay pictogramas guardados
-                        document.getElementById('imageGrid').innerHTML = '<p>No hay pictogramas guardados.</p>';
-                        return;
-                    }
-
-                    if (!response.ok) {
-                        throw new Error('Error obteniendo los pictogramas guardados.');
-                    }
-
-                    const pictograms = await response.json();
-
-                    // Cargar las imágenes en la cuadrícula
-                    imageGrid.innerHTML = pictograms.map((pictogram) => `                        
-                        <div class="pictogram-item">
-                            <img src="${pictogram.url_imagen}" alt="${pictogram.prompt}" data-toggle="modal" data-target="#imageModal" data-url="${pictogram.url_imagen}">
-                            <div class="delete-icon" data-id="${pictogram.id}"><i class="fas fa-times"></i></div>
-                        </div>
-                    `).join('');
-
-                    // Configurar eventos para las imágenes
-                    document.querySelectorAll('.image-grid img').forEach(img => {
-                        img.addEventListener('click', () => {
-                            const imgUrl = img.getAttribute('data-url');
-                            modalImage.src = imgUrl;
-                            downloadButton.href = imgUrl;
-                        });
-                    });
-
-                } catch (error) {
-                    console.error('Error:', error);
-                    imageGrid.innerHTML = '<p>Hubo un error obteniendo los pictogramas guardados.</p>';
-                }
-            });
-        });
-    </script>
+    <script src="auth.js" type="module"></script>
 </body>
 </html>

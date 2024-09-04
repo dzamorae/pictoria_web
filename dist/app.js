@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const isAuthenticated = localStorage.getItem('authToken') !== null;
     if (!isAuthenticated) {
         alert('Por favor, inicie sesión para continuar.');
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
         return;
     }
     // El resto de la lógica para manejar las pestañas y secciones
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
 (_a = document.getElementById('logoutButton')) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userId');
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
 });
 document.addEventListener('DOMContentLoaded', () => {
     var _a;
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const isAuthenticated = localStorage.getItem('authToken') !== null;
     if (!isAuthenticated) {
         alert('Por favor, inicie sesión para continuar.');
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
         return;
     }
     // Lógica para manejar las pestañas y secciones
@@ -55,14 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
         viewTab === null || viewTab === void 0 ? void 0 : viewTab.classList.remove('active');
     });
     viewTab === null || viewTab === void 0 ? void 0 : viewTab.addEventListener('click', () => __awaiter(void 0, void 0, void 0, function* () {
-        /*const userId = localStorage.getItem('userId');
-
-        if (!userId) {
-            alert('Usuario no autenticado');
-            
-            window.location.href = 'login.html';
-            return;
-        }*/
         document.getElementById('searchInput').value = '';
         generateSection.style.display = 'none';
         inputSection.style.display = 'none';
@@ -116,6 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event listener para cerrar sesión
     (_a = document.getElementById('logoutButton')) === null || _a === void 0 ? void 0 : _a.addEventListener('click', () => {
         localStorage.removeItem('authToken'); // Eliminar el token de autenticación
-        window.location.href = 'login.html'; // Redirigir al usuario a la página de inicio de sesión
+        window.location.href = 'index.html'; // Redirigir al usuario a la página de inicio de sesión
     });
 });

@@ -13,13 +13,11 @@ document.getElementById('loginForm')?.addEventListener('submit', async (event) =
     });
 
     if (response.ok) {
-        //alert('Inicio de sesión exitoso');
-        // Puedes almacenar el token de autenticación en localStorage
         const data = await response.json();
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('userId', data.userId);
         // Redirigir al usuario a la página principal
-        window.location.href = 'index.html';
+        window.location.href = 'pictoria.html';
     } else {
         alert('Credenciales inválidas');
     }
@@ -43,7 +41,7 @@ document.getElementById('registerForm')?.addEventListener('submit', async (event
     if (response.ok) {
         alert('Gracias por registrarse. Presione << Aceptar >> para continuar.');
         // Redirige al usuario a la página de inicio de sesión
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
     } else {
         alert('Error al registrar la cuenta. Por favor, intenta nuevamente.');
     }

@@ -27,7 +27,7 @@ var _a, _b;
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('userId', data.userId);
         // Redirigir al usuario a la página principal
-        window.location.href = 'index.html';
+        window.location.href = 'pictoria.html';
     }
     else {
         alert('Credenciales inválidas');
@@ -48,7 +48,7 @@ var _a, _b;
     if (response.ok) {
         alert('Gracias por registrarse. Presione << Aceptar >> para continuar.');
         // Redirige al usuario a la página de inicio de sesión
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
     }
     else {
         alert('Error al registrar la cuenta. Por favor, intenta nuevamente.');

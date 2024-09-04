@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!isAuthenticated) {
         alert('Por favor, inicie sesión para continuar.');
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
         return;
     }
 
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 document.getElementById('logoutButton')?.addEventListener('click', () => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userId');
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -38,9 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Verificación de autenticación
     const isAuthenticated = localStorage.getItem('authToken') !== null;
 
-    if (!isAuthenticated) {
+    if (!isAuthenticated) {        
         alert('Por favor, inicie sesión para continuar.');
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
         return;
     }
 
@@ -54,14 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     viewTab?.addEventListener('click', async () => {
-        /*const userId = localStorage.getItem('userId');
-
-        if (!userId) {
-            alert('Usuario no autenticado');
-            
-            window.location.href = 'login.html';
-            return;
-        }*/
 
         (document.getElementById('searchInput') as HTMLInputElement).value = '';
         generateSection!.style.display = 'none';
@@ -126,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event listener para cerrar sesión
     document.getElementById('logoutButton')?.addEventListener('click', () => {
         localStorage.removeItem('authToken');  // Eliminar el token de autenticación
-        window.location.href = 'login.html';  // Redirigir al usuario a la página de inicio de sesión
+        window.location.href = 'index.html';  // Redirigir al usuario a la página de inicio de sesión
     });
 });
 
