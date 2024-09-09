@@ -92,7 +92,7 @@ app.get('/get-pictograms', async (req, res) => {
     try {
         const db = await openDb();
         const pictograms = await db.all(
-          'SELECT prompt, url_imagen, estado FROM Pictograma WHERE usuario_id = ? and estado = "V" ORDER BY fecha_creacion', [userId]);
+          'SELECT * FROM Pictograma WHERE usuario_id = ? and estado = "V" ORDER BY fecha_creacion', [userId]);
 
         if (pictograms.length === 0) {
             console.log('No se encontraron pictogramas.');

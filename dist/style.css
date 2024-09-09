@@ -4,6 +4,25 @@ body, html {
   display: flex;
   flex-direction: column;
 }
+
+/* Para que el ícono aparezca en pantallas grandes y el texto en móviles */
+
+/* Mostrar solo el ícono en pantallas grandes */
+.logout-text {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* Mostrar el texto en pantallas móviles */
+  .logout-icon {
+      display: none;
+  }
+  
+  .logout-text {
+      display: inline;
+  }
+}
+
 .chat-container {
   flex: 1;
   display: flex;

@@ -21,8 +21,6 @@ var _a, _b;
         body: JSON.stringify({ email, password })
     });
     if (response.ok) {
-        //alert('Inicio de sesión exitoso');
-        // Puedes almacenar el token de autenticación en localStorage
         const data = yield response.json();
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('userId', data.userId);

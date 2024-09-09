@@ -109,6 +109,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
 
+            // Llamar a setupDeleteListeners después de cargar los pictogramas
+            setupDeleteListeners();
+
         } catch (error) {
             console.error('Error:', error);
             imageGrid!.innerHTML = '<h4>No hay pictogramas guardados.</h4>';
@@ -121,5 +124,46 @@ document.addEventListener('DOMContentLoaded', () => {
         window.location.href = 'index.html';  // Redirigir al usuario a la página de inicio de sesión
     });
 });
+
+function setupDeleteListeners() {
+    document.querySelectorAll('.delete-icon').forEach(button => {
+        button.addEventListener('click', async (event) => {
+            const viewTab = document.getElementById('viewTab');
+            const id = (event.currentTarget as HTMLElement).getAttribute('data-id');
+            if (!confirm('¿Estás seguro que deseas eliminar el pictograma?')) {
+                return false;
+            }
+
+            if (id) {
+                try {
+                    const response = await fetch('/delete-pictogram', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ id })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Error al eliminar el pictograma');
+                    }
+
+                    alert('Pictograma eliminado correctamente.');
+                    
+                } catch (error) {
+                    console.error('Error: desde app.ts');
+                    console.error('Error:', error);
+                    alert('Hubo un error al eliminar el pictograma.');
+                }
+                
+            }
+
+            if(viewTab){
+                viewTab.click();
+            }
+            
+        });
+    });
+}
 
 

@@ -82,6 +82,9 @@ export function setupEventListeners() {
 
                     document.querySelectorAll('.delete-icon').forEach(button => {
                         button.addEventListener('click', async (event) => {
+                            if (!confirm('¿Estás seguro que deseas eliminar el pictograma?')) {
+                                return false;
+                            }
                             const id = (event.currentTarget as HTMLElement).getAttribute('data-id');
                             if (id) {
                                 
@@ -126,6 +129,7 @@ export function setupEventListeners() {
                                             });
                                         });
                                     });
+                                    
                                     //(event.currentTarget as HTMLElement).parentElement?.remove(); // Remover el pictograma del DOM
                                 } catch (error) {
                                     console.error('Error:', error);
