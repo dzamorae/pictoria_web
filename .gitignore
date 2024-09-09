@@ -1,5 +1,10 @@
 node_modules/
 images/
 chrome-win64/
+tests/
 database.db
 .env
+*.png
+log.html
+output.xml
+report.html
